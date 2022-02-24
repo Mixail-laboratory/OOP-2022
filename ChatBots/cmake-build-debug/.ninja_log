@@ -1,0 +1,11 @@
+# ninja log v5
+0	18	1645718355163830393	CMakeFiles/ChatBots.dir/bot.c.o	4942edc13d98e26b
+0	16	1645718285435287293	CMakeFiles/ChatBots.dir/main.c.o	ce1b28cbde7322ae
+0	16	1645718065101514635	CMakeFiles/ChatBots.dir/new.c.o	bfceaf40eddb27fc
+0	17	1645718065105514669	CMakeFiles/ChatBots.dir/message.c.o	e0cb135a20970715
+0	16	1645718065105514669	CMakeFiles/ChatBots.dir/user.c.o	3bdfd4d9f5857561
+18	29	1645718355175830486	ChatBots	70c06dfa4e9aae19
+0	16	1645718983896817304	CMakeFiles/ChatBots.dir/main.c.o	ce1b28cbde7322ae
+1	16	1645718983896817304	CMakeFiles/ChatBots.dir/boy.c.o	97cded0652ca7644
+1	19	1645718983896817304	CMakeFiles/ChatBots.dir/bot.c.o	4942edc13d98e26b
+19	29	1645718983908817401	ChatBots	b6961615ec15de2e
