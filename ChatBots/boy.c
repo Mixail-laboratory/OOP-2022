@@ -32,7 +32,7 @@ static void Boy_type(const void *_self,struct message *mes) {
     message_insert(mes, "Hey");
 
     for (int i = mes->current; i < size; i++) {
-        if (strstr(mes->log[i], "I want a dress") != NULL) {
+        if ((strstr(mes->log[i], "I want a dress") != NULL) && (counter <= 1)) {
             printf("%s: ", name(self));
             puts("U r such a girl!R u afraid of rats?");
             counter++;

@@ -4,4 +4,5 @@ project(ChatBots C)
 set(CMAKE_C_STANDARD 11)
 
 add_executable(ChatBots main.c new.h new.c message.h message.c
-            user.c user.h bot.c bot.h boy.c boy.h)
+            user.c user.h bot.c bot.h boy.c boy.h girl.c girl.h
+            richBoy.c richBoy.h cowardGirl.h cowardGirl.c)

@@ -108,6 +108,24 @@ build CMakeFiles/ChatBots.dir/boy.c.o: C_COMPILER__ChatBots_Debug /home/mixail/�
   OBJECT_DIR = CMakeFiles/ChatBots.dir
   OBJECT_FILE_DIR = CMakeFiles/ChatBots.dir
 
+build CMakeFiles/ChatBots.dir/girl.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/girl.c || cmake_object_order_depends_target_ChatBots
+  DEP_FILE = CMakeFiles/ChatBots.dir/girl.c.o.d
+  FLAGS = -g -std=gnu11
+  OBJECT_DIR = CMakeFiles/ChatBots.dir
+  OBJECT_FILE_DIR = CMakeFiles/ChatBots.dir
+
+build CMakeFiles/ChatBots.dir/richBoy.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/richBoy.c || cmake_object_order_depends_target_ChatBots
+  DEP_FILE = CMakeFiles/ChatBots.dir/richBoy.c.o.d
+  FLAGS = -g -std=gnu11
+  OBJECT_DIR = CMakeFiles/ChatBots.dir
+  OBJECT_FILE_DIR = CMakeFiles/ChatBots.dir
+
+build CMakeFiles/ChatBots.dir/cowardGirl.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/cowardGirl.c || cmake_object_order_depends_target_ChatBots
+  DEP_FILE = CMakeFiles/ChatBots.dir/cowardGirl.c.o.d
+  FLAGS = -g -std=gnu11
+  OBJECT_DIR = CMakeFiles/ChatBots.dir
+  OBJECT_FILE_DIR = CMakeFiles/ChatBots.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target ChatBots
@@ -116,7 +134,7 @@ build CMakeFiles/ChatBots.dir/boy.c.o: C_COMPILER__ChatBots_Debug /home/mixail/�
 #############################################
 # Link the executable ChatBots
 
-build ChatBots: C_EXECUTABLE_LINKER__ChatBots_Debug CMakeFiles/ChatBots.dir/main.c.o CMakeFiles/ChatBots.dir/new.c.o CMakeFiles/ChatBots.dir/message.c.o CMakeFiles/ChatBots.dir/user.c.o CMakeFiles/ChatBots.dir/bot.c.o CMakeFiles/ChatBots.dir/boy.c.o
+build ChatBots: C_EXECUTABLE_LINKER__ChatBots_Debug CMakeFiles/ChatBots.dir/main.c.o CMakeFiles/ChatBots.dir/new.c.o CMakeFiles/ChatBots.dir/message.c.o CMakeFiles/ChatBots.dir/user.c.o CMakeFiles/ChatBots.dir/bot.c.o CMakeFiles/ChatBots.dir/boy.c.o CMakeFiles/ChatBots.dir/girl.c.o CMakeFiles/ChatBots.dir/richBoy.c.o CMakeFiles/ChatBots.dir/cowardGirl.c.o
   FLAGS = -g
   OBJECT_DIR = CMakeFiles/ChatBots.dir
   POST_BUILD = :

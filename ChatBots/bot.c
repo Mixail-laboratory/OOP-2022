@@ -4,6 +4,9 @@
 #include "user.h"
 #include "boy.h"
 #include "new.h"
+#include "girl.h"
+#include "richBoy.h"
+#include "cowardGirl.h"
 #include <string.h>
 
 char *getName(char *from) {
@@ -33,6 +36,23 @@ int create_people(char **names, void **people, FILE *f) {
             num++;
         }
 
+        if (strstr(buffer, " Girl")){
+            names[num] = getName(buffer);
+            people[num] = new(Girl, names[num]);
+            num++;
+        }
+
+        if (strstr(buffer, " RichBoy")){
+            names[num] = getName(buffer);
+            people[num] = new(RichBoy, names[num]);
+            num++;
+        }
+
+        if (strstr(buffer, " CowardGirl")){
+            names[num] = getName(buffer);
+            people[num] = new(CowardGirl, names[num]);
+            num++;
+        }
     }
     return num;
 }
