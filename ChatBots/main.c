@@ -1,20 +1,48 @@
 #include <stdio.h>
-#include<stdlib.h>
-#include "new.h"
+#include "New.h"
+#include "ChatArray.h"
+#include "Parser.h"
+#include "darray.h"
 
-#include "bot.h"
+void destroy(void **item) {
+    if (item == NULL) {
+        return;
+    }
+    delete(*item);
+}
+
+int main(int argc, char *argv[]) {
+
+    char *filename = NULL;
+
+    if (argc < 2) {
+        filename = "peoples.txt";
+    } else {
+        filename = argv[1];
+    }
 
 
-int main(int argc, char **argv) {
-    void **people = malloc(sizeof(void *) * 100);
-    char **names = malloc(sizeof(char *) * 100);
-    FILE *f = fopen("peoples.txt", "r");
-    if (f == NULL) {
+    if (filename == NULL) {
+        printf("NULL filename\n");
         return -1;
     }
-    int num = create_people(names, people, f);
-    struct message *mes = logg(names, people, num);
-    destroy_people(names, people, mes, num);
-    fclose(f);
+    Chat *chat = chat_create();
+    if (chat == NULL) {
+        printf("chat can't be created\n");
+        return -1;
+    }
+    void *users = parse_file(filename);
+    if (users == NULL) {
+        printf("can't parse the file\n");
+        return -1;
+    }
+    size_t users_num = darray_count(users);
+    for (size_t i = 0; i < users_num; i++) {
+        void **curr_user = ((void **) darray_item(users, i));
+        type(*curr_user, chat);
+    }
+    darray_destroy(users, (void (*)(void *)) destroy);
+    chat_destroy(chat);
+
     return 0;
 }

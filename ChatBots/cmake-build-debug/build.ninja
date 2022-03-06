@@ -78,50 +78,56 @@ build CMakeFiles/ChatBots.dir/main.c.o: C_COMPILER__ChatBots_Debug /home/mixail/
   OBJECT_DIR = CMakeFiles/ChatBots.dir
   OBJECT_FILE_DIR = CMakeFiles/ChatBots.dir
 
-build CMakeFiles/ChatBots.dir/new.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/new.c || cmake_object_order_depends_target_ChatBots
-  DEP_FILE = CMakeFiles/ChatBots.dir/new.c.o.d
+build CMakeFiles/ChatBots.dir/New.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/New.c || cmake_object_order_depends_target_ChatBots
+  DEP_FILE = CMakeFiles/ChatBots.dir/New.c.o.d
   FLAGS = -g -std=gnu11
   OBJECT_DIR = CMakeFiles/ChatBots.dir
   OBJECT_FILE_DIR = CMakeFiles/ChatBots.dir
 
-build CMakeFiles/ChatBots.dir/message.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/message.c || cmake_object_order_depends_target_ChatBots
-  DEP_FILE = CMakeFiles/ChatBots.dir/message.c.o.d
+build CMakeFiles/ChatBots.dir/darray.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/darray.c || cmake_object_order_depends_target_ChatBots
+  DEP_FILE = CMakeFiles/ChatBots.dir/darray.c.o.d
   FLAGS = -g -std=gnu11
   OBJECT_DIR = CMakeFiles/ChatBots.dir
   OBJECT_FILE_DIR = CMakeFiles/ChatBots.dir
 
-build CMakeFiles/ChatBots.dir/user.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/user.c || cmake_object_order_depends_target_ChatBots
-  DEP_FILE = CMakeFiles/ChatBots.dir/user.c.o.d
+build CMakeFiles/ChatBots.dir/ChatArray.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/ChatArray.c || cmake_object_order_depends_target_ChatBots
+  DEP_FILE = CMakeFiles/ChatBots.dir/ChatArray.c.o.d
   FLAGS = -g -std=gnu11
   OBJECT_DIR = CMakeFiles/ChatBots.dir
   OBJECT_FILE_DIR = CMakeFiles/ChatBots.dir
 
-build CMakeFiles/ChatBots.dir/bot.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/bot.c || cmake_object_order_depends_target_ChatBots
-  DEP_FILE = CMakeFiles/ChatBots.dir/bot.c.o.d
+build CMakeFiles/ChatBots.dir/Parser.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/Parser.c || cmake_object_order_depends_target_ChatBots
+  DEP_FILE = CMakeFiles/ChatBots.dir/Parser.c.o.d
   FLAGS = -g -std=gnu11
   OBJECT_DIR = CMakeFiles/ChatBots.dir
   OBJECT_FILE_DIR = CMakeFiles/ChatBots.dir
 
-build CMakeFiles/ChatBots.dir/boy.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/boy.c || cmake_object_order_depends_target_ChatBots
-  DEP_FILE = CMakeFiles/ChatBots.dir/boy.c.o.d
+build CMakeFiles/ChatBots.dir/User.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/User.c || cmake_object_order_depends_target_ChatBots
+  DEP_FILE = CMakeFiles/ChatBots.dir/User.c.o.d
   FLAGS = -g -std=gnu11
   OBJECT_DIR = CMakeFiles/ChatBots.dir
   OBJECT_FILE_DIR = CMakeFiles/ChatBots.dir
 
-build CMakeFiles/ChatBots.dir/girl.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/girl.c || cmake_object_order_depends_target_ChatBots
-  DEP_FILE = CMakeFiles/ChatBots.dir/girl.c.o.d
+build CMakeFiles/ChatBots.dir/Boy.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/Boy.c || cmake_object_order_depends_target_ChatBots
+  DEP_FILE = CMakeFiles/ChatBots.dir/Boy.c.o.d
   FLAGS = -g -std=gnu11
   OBJECT_DIR = CMakeFiles/ChatBots.dir
   OBJECT_FILE_DIR = CMakeFiles/ChatBots.dir
 
-build CMakeFiles/ChatBots.dir/richBoy.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/richBoy.c || cmake_object_order_depends_target_ChatBots
-  DEP_FILE = CMakeFiles/ChatBots.dir/richBoy.c.o.d
+build CMakeFiles/ChatBots.dir/Girl.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/Girl.c || cmake_object_order_depends_target_ChatBots
+  DEP_FILE = CMakeFiles/ChatBots.dir/Girl.c.o.d
   FLAGS = -g -std=gnu11
   OBJECT_DIR = CMakeFiles/ChatBots.dir
   OBJECT_FILE_DIR = CMakeFiles/ChatBots.dir
 
-build CMakeFiles/ChatBots.dir/cowardGirl.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/cowardGirl.c || cmake_object_order_depends_target_ChatBots
-  DEP_FILE = CMakeFiles/ChatBots.dir/cowardGirl.c.o.d
+build CMakeFiles/ChatBots.dir/RichBoy.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/RichBoy.c || cmake_object_order_depends_target_ChatBots
+  DEP_FILE = CMakeFiles/ChatBots.dir/RichBoy.c.o.d
+  FLAGS = -g -std=gnu11
+  OBJECT_DIR = CMakeFiles/ChatBots.dir
+  OBJECT_FILE_DIR = CMakeFiles/ChatBots.dir
+
+build CMakeFiles/ChatBots.dir/CowardGirl.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/CowardGirl.c || cmake_object_order_depends_target_ChatBots
+  DEP_FILE = CMakeFiles/ChatBots.dir/CowardGirl.c.o.d
   FLAGS = -g -std=gnu11
   OBJECT_DIR = CMakeFiles/ChatBots.dir
   OBJECT_FILE_DIR = CMakeFiles/ChatBots.dir
@@ -134,7 +140,7 @@ build CMakeFiles/ChatBots.dir/cowardGirl.c.o: C_COMPILER__ChatBots_Debug /home/m
 #############################################
 # Link the executable ChatBots
 
-build ChatBots: C_EXECUTABLE_LINKER__ChatBots_Debug CMakeFiles/ChatBots.dir/main.c.o CMakeFiles/ChatBots.dir/new.c.o CMakeFiles/ChatBots.dir/message.c.o CMakeFiles/ChatBots.dir/user.c.o CMakeFiles/ChatBots.dir/bot.c.o CMakeFiles/ChatBots.dir/boy.c.o CMakeFiles/ChatBots.dir/girl.c.o CMakeFiles/ChatBots.dir/richBoy.c.o CMakeFiles/ChatBots.dir/cowardGirl.c.o
+build ChatBots: C_EXECUTABLE_LINKER__ChatBots_Debug CMakeFiles/ChatBots.dir/main.c.o CMakeFiles/ChatBots.dir/New.c.o CMakeFiles/ChatBots.dir/darray.c.o CMakeFiles/ChatBots.dir/ChatArray.c.o CMakeFiles/ChatBots.dir/Parser.c.o CMakeFiles/ChatBots.dir/User.c.o CMakeFiles/ChatBots.dir/Boy.c.o CMakeFiles/ChatBots.dir/Girl.c.o CMakeFiles/ChatBots.dir/RichBoy.c.o CMakeFiles/ChatBots.dir/CowardGirl.c.o
   FLAGS = -g
   OBJECT_DIR = CMakeFiles/ChatBots.dir
   POST_BUILD = :
