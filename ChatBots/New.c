@@ -28,7 +28,7 @@ void delete(void *self)
     free(self);
 }
 
-void type(const void *self,struct message * mes)
+void type(const void *self,struct Message * mes)
 {
     const struct Class * const *cp = self;
     assert(self && *cp && (*cp)->type);

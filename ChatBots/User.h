@@ -2,7 +2,6 @@
 #define CHATBOTS_USER_H
 struct User {
     const void *class;
-    int num;
     char *name;
 };
 extern const void *User;

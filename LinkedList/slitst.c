@@ -1,5 +1,6 @@
 #include "slist.h"
 #include <stdlib.h>
+#include <assert.h>
 
 struct Node {
     void *data;
@@ -14,11 +15,13 @@ struct LinkedList {
 
 //Создать новый пустой односвязный список. Размер элемента -- itemSize байт.
 void *slist_create(size_t itemSize) {
-    if (itemSize == 0)
+    if (itemSize == 0) {
         return NULL;
+    }
     struct LinkedList *this = malloc(sizeof(struct LinkedList));
-    if (this == NULL)
+    if (this == NULL) {
         return NULL;
+    }
     this->itemSize = itemSize;
     this->head = NULL;
     this->listSize = 0;
@@ -27,14 +30,14 @@ void *slist_create(size_t itemSize) {
 
 //Количество элементов в списке. В случае, если slist равен NULL, возвращает INVALID константу.
 size_t slist_count(const void *slist) {
-    if (slist == NULL)
+    if (slist == NULL) {
         return INVALID;
+    }
     const struct LinkedList *this = slist;
     return this->listSize;
-
 }
 
-static void *createNode(size_t itemSize) {
+static struct Node *createNode(size_t itemSize) {
     struct Node *currNode = malloc(sizeof(struct Node));
     if (currNode == NULL) {
         return NULL;
@@ -52,7 +55,6 @@ static void *createNode(size_t itemSize) {
 static void destroyNodes(void *linkedList, void (*destroy)(void *)) {
     struct LinkedList *this = linkedList;
     struct Node *currNode = this->head;
-    struct Node *next;
     if (this->listSize == 0) {
         return;
     }
@@ -61,7 +63,7 @@ static void destroyNodes(void *linkedList, void (*destroy)(void *)) {
         if (destroy != NULL && currNode->data != NULL) {
             destroy(currNode->data);
         }
-        next = currNode->next;
+        struct Node *next = currNode->next;
         free(currNode->data);
         free(currNode);
         currNode = next;
@@ -74,9 +76,8 @@ static void destroyNodes(void *linkedList, void (*destroy)(void *)) {
 void slist_destroy(void *slist, void (*destroy)(void *)) {
     if (slist == NULL)
         return;
-    struct LinkedList *this = slist;
-    destroyNodes(this, destroy);
-    free(this);
+    destroyNodes(slist, destroy);
+    free(slist);
 }
 
 //Инициализировать односвязный список новыми параметрами.
@@ -86,22 +87,18 @@ void slist_destroy(void *slist, void (*destroy)(void *)) {
 void *slist_init(void *slist, size_t itemSize, void (*destroy)(void *)) {
     if ((slist == NULL) || (itemSize == 0))
         return NULL;
+    slist_clear(slist, destroy);
     struct LinkedList *this = slist;
-    if (this->listSize == 0) {
-        this->itemSize = itemSize;
-        return this;
-    }
-    destroyNodes(this, destroy);
-    this = slist_create(itemSize);
+    this->itemSize = itemSize;
     return this;
 }
 
 //Удалить все элементы из односвязного списка. Если указана функция destroy, то вызвать её для каждого удаляемого элемента.
 void slist_clear(void *slist, void (*destroy)(void *)) {
-    struct LinkedList *this = slist;
-    if (this == NULL)
+    if (slist == NULL)
         return;
-    destroyNodes(this, destroy);
+    destroyNodes(slist, destroy);
+    struct LinkedList *this = slist;
     this->listSize = 0;
 }
 
@@ -110,6 +107,7 @@ size_t slist_stop(const void *slist) {
     return (size_t) NULL;
 }
 
+//Получить элемент по индексу в списке
 void *slist_item(void *slist, size_t i) {
     if (slist == NULL)
         return NULL;
@@ -138,6 +136,7 @@ void *slist_prepend(void *slist) {
         newHead->next = this->head;
     }
     this->head = newHead;
+    assert(this->head == newHead);
     this->listSize++;
     return this->head->data;
 }
@@ -145,46 +144,42 @@ void *slist_prepend(void *slist) {
 ///slist_remove -- Удалить элемент из головы односвязного списка.
 ///Если указана функция destroy, то вызвать её для удаляемого элемента.
 void slist_remove(void *slist, void (*destroy)(void *)) {
-    if (slist == NULL)
+    if (slist == NULL) {
         return;
-    struct LinkedList *this = slist;
-    if (this->listSize == 0)
+    }
+    struct Node *currNode = ((struct LinkedList *) slist)->head;
+    if (currNode == NULL) {
         return;
+    }
     if (destroy) {
-        destroy(this->head->data);
+        destroy(currNode->data);
     }
-    free(this->head->data);
-    if (this->head->next) {
-        struct Node *newHead = this->head->next;
-        free(this->head);
-        this->head = newHead;
-    } else {
-        free(this->head);
-    }
-    this->listSize--;
+    free(currNode->data);
+
+    ((struct LinkedList *) slist)->head = currNode->next;
+    ((struct LinkedList *) slist)->listSize--;
+
+    free(currNode);
+
 }
 
 //Получить указатель на элемент списка по его идентификатору.
 void *slist_current(const void *slist, size_t item_id) {
-    if (slist == NULL)
+    if (slist == NULL || item_id == slist_stop(slist) || item_id == INVALID) {
         return NULL;
-    const struct LinkedList *this = slist;
-    if ((item_id == INVALID) || (item_id == slist_stop(this)))
-        return NULL;
-    struct Node *currNode = (struct Node *) item_id;
-    return currNode->data;
+    }
+    return ((struct Node *) item_id)->data;
 }
 
 //Идентификатор для первого элемента из односвязного списка. Идентификатор может стать невалидным при модификации списка.
 size_t slist_first(const void *slist) {
-    if (slist == NULL)
-        return slist_stop(slist);
     const struct LinkedList *this = slist;
-    if (this->listSize == 0)
+    if (this == NULL || this->listSize == 0)
         return slist_stop(slist);
     return (size_t) this->head;
 }
 
+// По идентификатору текущего элемента получить идентификатор следующего элемента списка.
 size_t slist_next(const void *slist, size_t item_id) {
     if (slist == NULL)
         return slist_stop(slist);
