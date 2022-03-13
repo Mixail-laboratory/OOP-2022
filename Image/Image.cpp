@@ -3,24 +3,31 @@
 
 Image::Image() {
     setClear();
+    CountRef = new size_t;
+    *CountRef = 1;
 }
 
 Image::Image(int rows, int cols, int channels) {
     if (rows <= 0 || cols <= 0 || channels <= 0) {
         setClear();
+        CountRef = new size_t;
+        *CountRef = 1;
         return;
     }
     Rows = rows;
     Cols = cols;
     Channels = channels;
     Total = Cols * Rows * Channels;
-    Data = nullptr;
-    CountRef.reset(new size_t);
+    Data = new unsigned char[Total];
+    CountRef = new size_t;
+    *CountRef = 1;
 }
 
 Image::Image(int rows, int cols, int channels, unsigned char *data) {
     if (rows <= 0 || cols <= 0 || channels <= 0 || data == nullptr) {
         setClear();
+        CountRef = new size_t;
+        *CountRef = 1;
         return;
     }
     Rows = rows;
@@ -28,12 +35,15 @@ Image::Image(int rows, int cols, int channels, unsigned char *data) {
     Channels = channels;
     Total = Cols * Rows * Channels;
     Data = data;
-    CountRef.reset(new size_t);
+    CountRef = new size_t;
+    *CountRef = 1;
 }
 
 Image::Image(const Image &image, const Range &rowRange, const Range &colRange) {
     if (rowRange.empty() || colRange.empty()) {
         setClear();
+        CountRef = new size_t;
+        *CountRef = 1;
         return;
     }
     Channels = image.Channels;
@@ -43,6 +53,8 @@ Image::Image(const Image &image, const Range &rowRange, const Range &colRange) {
         Cols = image.Cols - colRange.start();
     } else {
         setClear();
+        CountRef = new size_t;
+        *CountRef = 1;
         return;
     }
 
@@ -54,16 +66,23 @@ Image::Image(const Image &image, const Range &rowRange, const Range &colRange) {
 
     } else {
         setClear();
+        CountRef = new size_t;
+        *CountRef = 1;
         return;
     }
     Data = image.Data;
     CountRef = image.CountRef;
     Channels = image.Channels;
     Total = Rows * Cols * Channels;
+    (*CountRef)++;
 }
 
 size_t Image::countRef() const {
-    return CountRef.use_count();
+    if (CountRef == nullptr) {
+        return 0;
+    } else {
+        return *CountRef;
+    }
 }
 
 int Image::rows() const {
@@ -94,11 +113,13 @@ Image Image::clone() const {
     Image image;
     image.Cols = Cols;
     image.Rows = Rows;
-    image.Channels = Channels;
-    image.CountRef = CountRef;
     image.Total = Total;
+    image.Channels = Channels;
+    image.CountRef = new size_t;
+    *(image.CountRef) = 1;
+
     if (!(this->empty())) {
-        image.Data = new unsigned char[Total];
+        image.Data = new unsigned char[image.Total];
         memcpy(image.Data, Data, Total);
     } else {
         image.Data = nullptr;
@@ -111,32 +132,44 @@ void Image::copyTo(Image &image) const {
     if (this == &image) {
         return;
     }
+    image.release();
     image.Cols = Cols;
     image.Rows = Rows;
     image.Channels = Channels;
-    image.CountRef = CountRef;
+    image.CountRef = new size_t;
+    *image.CountRef = 1;
     image.Total = Total;
-    delete image.Data;
-    image.Data = new unsigned char;
+    image.Data = new unsigned char[Total];
     std::memcpy(image.Data, Data, Total);
 }
 
 void Image::create(int rows, int cols, int channels) {
-    if (rows <= 0 || cols <= 0 || channels <= 0){
+    if (rows <= 0 || cols <= 0 || channels <= 0) {
         setClear();
+        CountRef = new size_t;
+        *CountRef = 1;
         return;
     }
     Rows = rows;
     Cols = cols;
     Channels = channels;
+    Total = Rows * Cols * Channels;
+    (*CountRef) = 1;
+    Data = new unsigned char[Total];
 }
 
 unsigned char &Image::at(int index) {
+    if (index > Total) {
+        throw std::out_of_range("out of range");
+    }
     unsigned char &pixel = Data[index];
     return pixel;
 }
 
 const unsigned char &Image::at(int index) const {
+    if (index > Total) {
+        throw std::out_of_range("out of range");
+    }
     const unsigned char &pixel = Data[index];
     return pixel;
 }
@@ -150,10 +183,7 @@ Image Image::zeros(int rows, int cols, int channels) {
 }
 
 Image Image::values(int rows, int cols, int channels, unsigned char value) {
-    Image image;
-    image.Rows = rows;
-    image.Cols = cols;
-    image.Channels = channels;
+    Image image(rows, cols, channels);
     image.Total = rows * cols * channels;
     image.Data = new unsigned char;
     std::memset(image.Data, value, image.Total);
@@ -161,7 +191,15 @@ Image Image::values(int rows, int cols, int channels, unsigned char value) {
 }
 
 void Image::release() {
-    CountRef.reset();
+    if (CountRef != nullptr) {
+        --(*CountRef);
+
+        if (*CountRef <= 0) {
+            delete CountRef;
+            CountRef = nullptr;
+        }
+        setClear();
+    }
 }
 
 Image Image::col(int x) const {
@@ -188,7 +226,7 @@ Image Image::rowRange(const Range &range) const {
     }
 }
 
-Image Image::operator()(const Range &rowRange, const Range &colRange) {
+Image Image::operator()(const Range &rowRange, const Range &colRange) const {
     return {*this, rowRange, colRange};
 }
 
@@ -198,14 +236,37 @@ void Image::setClear() {
     Channels = 0;
     Total = 0;
     Data = nullptr;
-    CountRef.reset(new size_t);
 }
 
-Image &Image::operator=(const Image &image) = default;
+Image &Image::operator=(const Image &image) {
+    if (this == &image)
+        return *this;
+    release();
 
-Image::Image(const Image &image) = default;
 
-Image::~Image() = default;
+    Channels = image.Channels;
+    Cols = image.Cols;
+    Rows = image.Rows;
+    Total = image.Total;
+    Data = image.Data;
+    CountRef = image.CountRef;
+    (*CountRef)++;
+    return *this;
+}
+
+Image::Image(const Image &image) {
+    Cols = image.Cols;
+    Rows = image.Rows;
+    Total = image.Total;
+    Data = image.Data;
+    Channels = image.Channels;
+    CountRef = image.CountRef;
+    (*CountRef)++;
+}
+
+Image::~Image() {
+    release();
+}
 
 
 

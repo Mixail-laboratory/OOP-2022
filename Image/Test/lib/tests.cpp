@@ -1,13 +1,20 @@
 #include "gtest/gtest.h"
 #include "../../Image.hpp"
 
-
-
 void fillImage(Image &img) {
     for (int i = 0; i < img.total(); ++i) {
         img.data()[i] = i;
     }
+}
 
+bool isEqual(const Image &img1, const Image &img2) {
+    for (int i = 0; i < img1.total(); ++i) {
+        if (img1.data()[i] != img2.data()[i]) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 TEST(RangeCtor, Default) {
@@ -161,7 +168,7 @@ TEST(ImageCtor, ValidArgs) {
     EXPECT_EQ(img.channels(), 5);
     EXPECT_EQ(img.total(), 125);
     EXPECT_EQ(img.countRef(), 1);
-    EXPECT_TRUE(img.empty());
+    EXPECT_FALSE(img.empty());
 }
 
 TEST(ImageCtor, ValidArgsWithPointer) {
@@ -179,19 +186,10 @@ TEST(ImageCtor, ValidArgsWithPointer) {
     delete[] TestData;
 }
 
-TEST(ImageCtor, CopyOfEmpty) {
-    const Image img;
-    std::vector<Image> imgs;
-    for (int i = 0; i < 100; ++i) {
-        imgs.push_back(img);
-        ASSERT_EQ(img.countRef(), imgs.size() + 1);
-    }
-    imgs.clear();
-    ASSERT_EQ(img.countRef(), 1);
-}
+
 
 TEST(ImageCtor, CopyOfValidImg) {
-    unsigned char *TestData = new unsigned char[125];
+    unsigned char *TestData = new unsigned char[150];
 
     Image refimg = Image(5, 5, 5, TestData);
 
@@ -206,6 +204,7 @@ TEST(ImageCtor, CopyOfValidImg) {
     EXPECT_EQ(img.data(), TestData);
     EXPECT_FALSE(img.empty());
 
+    EXPECT_TRUE(isEqual(img, refimg));
 
     delete[] TestData;
 }
@@ -225,6 +224,7 @@ TEST(ImageCtor, CopyWithRanges) {
     EXPECT_EQ(img.data(), TestData);
     EXPECT_FALSE(img.empty());
 
+    EXPECT_TRUE(isEqual(img, refimg));
 
     delete[] TestData;
 }
@@ -242,13 +242,14 @@ TEST(ImageOperatorAssignment, EmptyImg) {
 
 TEST(ImageOperatorAssignment, ValidImg) {
     Image img(5, 5, 5);
-    img.values(5, 5, 5, 5);
+    fillImage(img);
 
     std::vector<Image> imgs(100);
     for (int i = 0; i < imgs.size(); ++i) {
         imgs[i] = img;
         ASSERT_EQ(img.countRef(), i + 2);
-      }
+        EXPECT_TRUE(isEqual(img, imgs[i]));
+    }
     imgs.clear();
     ASSERT_EQ(img.countRef(), 1);
 }
@@ -283,12 +284,26 @@ TEST(ImageOperatorBrackets, InvalidColRange) {
 
 }
 
+TEST(ImageOperatorBrackets, ValidImg) {
+    Image img(10, 10, 10);
+
+    fillImage(img);
+
+    for (int i = 0; i < 10; ++i) {
+        auto tempimg1 = img(Range(0, 10 - i), Range(0, 10 - i));
+        auto tempimg2 = img(Range(i, 10), Range(i, 10));
+
+        ASSERT_TRUE(isEqual(img, tempimg1));
+        ASSERT_TRUE(isEqual(img, tempimg2));
+    }
+}
+
 
 TEST(ImageCopy, EmptyImg) {
     const Image img;
     const Image clone = img.clone();
-    EXPECT_EQ(img.countRef(), 2);
-    EXPECT_EQ(clone.countRef(), 2);
+    EXPECT_EQ(img.countRef(), 1);
+    EXPECT_EQ(clone.countRef(), 1);
 }
 
 TEST(ImageCopy, ValidImg) {
@@ -296,8 +311,8 @@ TEST(ImageCopy, ValidImg) {
 
     Image cloneimg = img.clone();
 
-
-    EXPECT_TRUE(img.data() == cloneimg.data());
+    EXPECT_TRUE(isEqual(img, cloneimg));
+    EXPECT_FALSE(img.data() == cloneimg.data());
 }
 
 TEST(ImageCopy, RefImg) {
@@ -305,22 +320,56 @@ TEST(ImageCopy, RefImg) {
 
     Image cloneimg = Image(img).clone();
 
-
-    EXPECT_TRUE(img.data() == cloneimg.data());
+    EXPECT_TRUE(isEqual(img, cloneimg));
+    EXPECT_FALSE(img.data() == cloneimg.data());
 }
 
 TEST(ImageCopyTo, EmptyImg) {
     const Image img;
     Image clone;
     img.copyTo(clone);
-    EXPECT_EQ(img.countRef(), 2);
-    EXPECT_EQ(clone.countRef(), 2);
+    EXPECT_EQ(img.countRef(), 1);
+    EXPECT_EQ(clone.countRef(), 1);
 }
 
+TEST(ImageCopyTo, ValidImgs) {
+    Image img(5, 5, 5);
+
+    fillImage(img);
+
+    Image clone;
+    img.copyTo(clone);
+    EXPECT_EQ(img.countRef(), 1);
+    EXPECT_EQ(clone.countRef(), 1);
+
+    EXPECT_TRUE(isEqual(img, clone));
+}
+
+TEST(ImageCopyTo, RefImages) {
+    Image img(5, 5, 5);
+
+    fillImage(img);
+
+    Image clone;
+    Image(img).copyTo(clone);
+    EXPECT_EQ(img.countRef(), 1);
 
 
+    EXPECT_TRUE(isEqual(img, clone));
+}
 
+TEST(ImageCopyTo, Self) {
+    Image img(10, 10, 10);
+    fillImage(img);
 
+    Image ref = img(Range(5, 10), Range(5, 10));
+    ref.copyTo(ref);
+
+    EXPECT_EQ(img.countRef(), 2);
+    EXPECT_EQ(img.data(), ref.data());
+    EXPECT_EQ(ref.countRef(), 2);
+    EXPECT_TRUE(isEqual(img, ref));
+}
 
 TEST(ImageCreate, InvalidRow) {
     for (int row = -5; row <= 0; ++row) {
@@ -373,7 +422,7 @@ TEST(ImageEmpty, EmptyImage) {
 
 TEST(ImageEmpty, NotEmptyImage) {
     Image img(5, 5, 5);
-    EXPECT_TRUE(img.empty());
+    EXPECT_FALSE(img.empty());
 }
 
 TEST(ImageRelease, InvalidRow) {
@@ -382,9 +431,7 @@ TEST(ImageRelease, InvalidRow) {
 
     img.release();
 
-    EXPECT_EQ(img.countRef(), 1);
-
-    EXPECT_EQ(img.countRef(), 1);
+    EXPECT_EQ(img.countRef(), 0);
     EXPECT_EQ(img.channels(), 0);
     EXPECT_EQ(img.rows(), 0);
     EXPECT_EQ(img.cols(), 0);
@@ -397,9 +444,8 @@ TEST(ImageRelease, InvalidCol) {
 
     img.release();
 
-    EXPECT_EQ(img.countRef(), 1);
 
-    EXPECT_EQ(img.countRef(), 1);
+    EXPECT_EQ(img.countRef(), 0);
     EXPECT_EQ(img.channels(), 0);
     EXPECT_EQ(img.rows(), 0);
     EXPECT_EQ(img.cols(), 0);
@@ -413,9 +459,9 @@ TEST(ImageRelease, InvalidChannel) {
 
     img.release();
 
-    EXPECT_EQ(img.countRef(), 1);
 
-    EXPECT_EQ(img.countRef(), 1);
+
+    EXPECT_EQ(img.countRef(), 0);
     EXPECT_EQ(img.channels(), 0);
     EXPECT_EQ(img.rows(), 0);
     EXPECT_EQ(img.cols(), 0);
@@ -428,9 +474,9 @@ TEST(ImageRelease, InvalidPointerArr) {
 
     img.release();
 
-    EXPECT_EQ(img.countRef(), 1);
 
-    EXPECT_EQ(img.countRef(), 1);
+
+    EXPECT_EQ(img.countRef(), 0);
     EXPECT_EQ(img.channels(), 0);
     EXPECT_EQ(img.rows(), 0);
     EXPECT_EQ(img.cols(), 0);
@@ -448,11 +494,11 @@ TEST(ImageRelease, InvalidRowRanges) {
 
     img.release();
 
-    EXPECT_EQ(img.countRef(), 1);
+    EXPECT_EQ(img.countRef(), 0);
     EXPECT_EQ(partimg.countRef(), 1);
 
 
-    EXPECT_EQ(img.countRef(), 1);
+
     EXPECT_EQ(img.channels(), 0);
     EXPECT_EQ(img.rows(), 0);
     EXPECT_EQ(img.cols(), 0);
@@ -470,11 +516,9 @@ TEST(ImageRelease, InvalidColRanges) {
 
     img.release();
 
-    EXPECT_EQ(img.countRef(), 1);
+    EXPECT_EQ(img.countRef(), 0);
     EXPECT_EQ(partimg.countRef(), 1);
 
-
-    EXPECT_EQ(img.countRef(), 1);
     EXPECT_EQ(img.channels(), 0);
     EXPECT_EQ(img.rows(), 0);
     EXPECT_EQ(img.cols(), 0);
@@ -527,4 +571,106 @@ TEST(ImageRelease, ValidArgsWithPointer) {
             }
         }
     }
+}
+
+TEST(ImageCol, EmptyImg) {
+    Image img;
+    Image emptyimg;
+
+    EXPECT_TRUE(isEqual(img.col(0), emptyimg));
+}
+
+TEST(ImageCol, InvalidArg) {
+    Image img(5, 5, 5);
+    Image emptyimg;
+
+    EXPECT_TRUE(isEqual(img.col(-10), emptyimg));
+}
+
+TEST(ImageCol, ValidArgs) {
+    Image img(5, 5, 5);
+    Image comp(5, 5, 5);
+
+    fillImage(img);
+    fillImage(comp);
+
+    for (int i = 0; i < 5; ++i) {
+        EXPECT_TRUE(isEqual(img.col(i), comp.col(i)));
+    }
+}
+
+TEST(ImageColRange, EmptyImg) {
+    Image img;
+    Image emptyimg;
+
+    EXPECT_TRUE(isEqual(img.colRange(Range().all()), emptyimg));
+}
+
+TEST(ImageColRange, RangeAll) {
+    Image img(5, 5, 5);
+    Image emptyimg;
+
+    EXPECT_TRUE(isEqual(img.colRange(Range().all()), img));
+}
+
+TEST(ImageColRange, ColRangeOfColRange) {
+    Image img(5, 5, 5);
+    Image comp(5, 5, 5);
+
+    fillImage(img);
+    auto newimage = img.colRange(Range().all());
+
+    EXPECT_TRUE(isEqual(img, newimage.colRange(Range().all())));
+
+}
+
+TEST(ImageRow, EmptyImg) {
+    Image img;
+    Image emptyimg;
+
+    EXPECT_TRUE(isEqual(img.row(0), emptyimg));
+}
+
+TEST(ImageRow, InvalidArg) {
+    Image img(5, 5, 5);
+    Image emptyimg;
+
+    EXPECT_TRUE(isEqual(img.row(-10), emptyimg));
+}
+
+TEST(ImageRow, ValidArgs) {
+    Image img(5, 5, 5);
+    Image comp(5, 5, 5);
+
+    fillImage(img);
+    fillImage(comp);
+
+    for (int i = 0; i < 5; ++i) {
+        EXPECT_TRUE(isEqual(img.row(i), comp.row(i)));
+    }
+}
+
+TEST(ImageRowRange, EmptyImg) {
+    Image img;
+    Image emptyimg;
+
+    EXPECT_TRUE(isEqual(img.colRange(Range().all()), emptyimg));
+}
+
+TEST(ImageRowRange, RangeAll) {
+    Image img(5, 5, 5);
+    Image emptyimg;
+
+    EXPECT_TRUE(isEqual(img.colRange(Range().all()), img));
+}
+
+TEST(ImageRowRange, ColRangeOfColRange) {
+    Image img(5, 5, 5);
+    Image comp(5, 5, 5);
+
+    fillImage(img);
+    auto newimage = img.colRange(Range().all());
+
+    EXPECT_TRUE(isEqual(img, newimage.colRange(Range().all())));
+
 }

@@ -1,6 +1,5 @@
 #include <iostream>
-#include <memory>
-#include "Range.hpp"
+
 #include "Image.hpp"
 int main() {
 
