@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
     char array = 'f';
     slist_insert(slist, (size_t) array);
     //Добавляем новый элемент в односвязный список
-
+    slist_erase(slist, (size_t)(slist_first(slist)), NULL);
     slist_destroy(slist, NULL);
 
     return 0;
