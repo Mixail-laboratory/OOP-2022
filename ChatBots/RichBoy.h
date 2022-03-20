@@ -1,14 +1,13 @@
 #ifndef CHATBOTS_RICHBOY_H
 #define CHATBOTS_RICHBOY_H
-
-#include "Boy.h"
+#include "User.h"
 
 struct RichBoy {
 
-    struct Boy base_boy;
+    struct User base_user;
 
 };
 
 
 extern const void *RichBoy;
-#endif //CHATBOTS_RICHBOY_H
+#endif

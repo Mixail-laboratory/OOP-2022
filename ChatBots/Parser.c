@@ -1,8 +1,16 @@
 #include "Parser.h"
-#include "darray.h"
+#include "DArray.h"
+#include <stdio.h>
+#include <string.h>
+#include "User.h"
+#include "Boy.h"
+#include "Girl.h"
+#include "RichBoy.h"
+#include "CowardGirl.h"
+#include "New.h"
+
 
 void *parse_file(const char *filename) {
-    {
         if (filename == NULL) {
             printf("parse_file err: NULL filename\n");
             return NULL;
@@ -13,32 +21,33 @@ void *parse_file(const char *filename) {
             printf("parse_file err: file can't be opened\n");
             return NULL;
         }
+        char buffer[256];
         void *users = darray_create(sizeof(void *));
-        void **tmp;
-        char line[256];
-        void *curr_user = NULL;
+
+
+        void *curr_user;
         if (users == NULL) {
-            printf("parse_file err: users arr can't be created\n");
+            printf("parse_file err: users can't be created\n");
             fclose(file);
             return NULL;
         }
-        while (fgets(line, 256, file)) {
-            curr_user = parse_line(line);
+        while (fgets(buffer, 256, file)) {
+            curr_user = parse_line(buffer);
             if (curr_user == NULL) {
-                printf("parse_file warning: %s - incorrect line\n", line);
+                printf("parse_file warning: %s - incorrect line\n", buffer);
                 continue;
             }
-            tmp = darray_add(users);
+            void **tmp = darray_add(users);
             *tmp = curr_user;
         }
         fclose(file);
         return users;
-    }
+
 }
 
 void *parse_line(const char *line) {
     void *curr_user = NULL;
-    char name[256] = {0};
+    char name[256] = {};
     sscanf(line, "%s", name);
 
 

@@ -2,7 +2,7 @@
 #include "New.h"
 #include "ChatArray.h"
 #include "Parser.h"
-#include "darray.h"
+#include "DArray.h"
 
 void destroy(void **item) {
     if (item == NULL) {
@@ -12,21 +12,12 @@ void destroy(void **item) {
 }
 
 int main(int argc, char *argv[]) {
-
-    char *filename = NULL;
-
-    if (argc < 2) {
-        filename = "peoples.txt";
-    } else {
-        filename = argv[1];
-    }
-
-
+    char* filename = argv[1];
     if (filename == NULL) {
         printf("NULL filename\n");
         return -1;
     }
-    Chat *chat = chat_create();
+    struct Chat *chat = CreateChat();
     if (chat == NULL) {
         printf("chat can't be created\n");
         return -1;
@@ -42,7 +33,7 @@ int main(int argc, char *argv[]) {
         type(*curr_user, chat);
     }
     darray_destroy(users, (void (*)(void *)) destroy);
-    chat_destroy(chat);
+    DeleteChat(chat);
 
     return 0;
 }

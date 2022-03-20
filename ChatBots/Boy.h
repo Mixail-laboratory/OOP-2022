@@ -1,7 +1,5 @@
 #ifndef CHATBOTS_BOY_H
 #define CHATBOTS_BOY_H
-#include <stdbool.h>
-
 #include "User.h"
 
 struct Boy {
@@ -12,4 +10,4 @@ struct Boy {
 
 
 extern const void *Boy;
-#endif //CHATBOTS_BOY_H
+#endif

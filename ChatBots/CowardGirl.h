@@ -8,4 +8,4 @@ struct CowardGirl {
 };
 
 extern const void *CowardGirl;
-#endif //CHATBOTS_COWARDGIRL_H
+#endif

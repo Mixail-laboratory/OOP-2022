@@ -1,18 +1,18 @@
 #ifndef CHATBOTS_CHATARRAY_H
 #define CHATBOTS_CHATARRAY_H
-#include <stdlib.h>
-typedef struct {
-    void* arr;
-} Chat;
 
-Chat* chat_create();
+struct Chat {
+    void *Array;
+};
 
-void chat_destroy(Chat* chat);
+struct Chat *CreateChat();
 
-int chat_scan(Chat* chat, const char* key_phrase);
+void DeleteChat(struct Chat *chat);
 
-int chat_add(Chat* chat, const char* message);
+int FindPhrase(struct Chat *chat, const char *key_phrase);
 
-int scan_phrase(const char* phrase, const char* key_word);
+const char* ChatPush(struct Chat *chat, const char *message);
 
-#endif //CHATBOTS_CHATARRAY_H
+int scan_phrase(const char *phrase, const char *key_word);
+
+#endif

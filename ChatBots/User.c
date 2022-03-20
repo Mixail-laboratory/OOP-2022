@@ -1,5 +1,4 @@
 #include <stdarg.h>
-#include <stdlib.h>
 #include <stdio.h>
 #include "User.h"
 #include "New.h"
@@ -8,24 +7,22 @@
 
 static void *User_ctor(void *_self, va_list *app) {
     struct User *self = _self;
-    char *name = va_arg(*app, char*);
-    strcpy(self->name, name);
+    strcpy(self->name, va_arg(*app, char*));
     return self;
 }
 
-static void User_type(void *_self,void* _chat) {
+static void User_type(void *_self, void *_chat) {
     struct User *self = _self;
-    Chat* chat = _chat;
+    struct Chat *chat = _chat;
     printf("%s: %s\n", self->name, "Hey");
-    chat_add(chat, "Hey");
+    ChatPush(chat, "Hey");
 }
-
 
 
 static const struct Class _User = {
         sizeof(struct User),
         User_ctor,
-        0,
+        NULL,
         (void (*)(void *, void *)) User_type
 };
 

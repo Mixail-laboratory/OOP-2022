@@ -84,8 +84,8 @@ build CMakeFiles/ChatBots.dir/New.c.o: C_COMPILER__ChatBots_Debug /home/mixail/�
   OBJECT_DIR = CMakeFiles/ChatBots.dir
   OBJECT_FILE_DIR = CMakeFiles/ChatBots.dir
 
-build CMakeFiles/ChatBots.dir/darray.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/darray.c || cmake_object_order_depends_target_ChatBots
-  DEP_FILE = CMakeFiles/ChatBots.dir/darray.c.o.d
+build CMakeFiles/ChatBots.dir/DArray.c.o: C_COMPILER__ChatBots_Debug /home/mixail/Документы/phys/OOP/ChatBots/DArray.c || cmake_object_order_depends_target_ChatBots
+  DEP_FILE = CMakeFiles/ChatBots.dir/DArray.c.o.d
   FLAGS = -g -std=gnu11
   OBJECT_DIR = CMakeFiles/ChatBots.dir
   OBJECT_FILE_DIR = CMakeFiles/ChatBots.dir
@@ -140,7 +140,7 @@ build CMakeFiles/ChatBots.dir/CowardGirl.c.o: C_COMPILER__ChatBots_Debug /home/m
 #############################################
 # Link the executable ChatBots
 
-build ChatBots: C_EXECUTABLE_LINKER__ChatBots_Debug CMakeFiles/ChatBots.dir/main.c.o CMakeFiles/ChatBots.dir/New.c.o CMakeFiles/ChatBots.dir/darray.c.o CMakeFiles/ChatBots.dir/ChatArray.c.o CMakeFiles/ChatBots.dir/Parser.c.o CMakeFiles/ChatBots.dir/User.c.o CMakeFiles/ChatBots.dir/Boy.c.o CMakeFiles/ChatBots.dir/Girl.c.o CMakeFiles/ChatBots.dir/RichBoy.c.o CMakeFiles/ChatBots.dir/CowardGirl.c.o
+build ChatBots: C_EXECUTABLE_LINKER__ChatBots_Debug CMakeFiles/ChatBots.dir/main.c.o CMakeFiles/ChatBots.dir/New.c.o CMakeFiles/ChatBots.dir/DArray.c.o CMakeFiles/ChatBots.dir/ChatArray.c.o CMakeFiles/ChatBots.dir/Parser.c.o CMakeFiles/ChatBots.dir/User.c.o CMakeFiles/ChatBots.dir/Boy.c.o CMakeFiles/ChatBots.dir/Girl.c.o CMakeFiles/ChatBots.dir/RichBoy.c.o CMakeFiles/ChatBots.dir/CowardGirl.c.o
   FLAGS = -g
   OBJECT_DIR = CMakeFiles/ChatBots.dir
   POST_BUILD = :
