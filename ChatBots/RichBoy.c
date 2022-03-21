@@ -2,7 +2,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include "User.h"
-#include "Boy.h"
 #include "New.h"
 #include "ChatArray.h"
 
