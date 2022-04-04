@@ -7,23 +7,21 @@ Image::Image() {
     *CountRef = 1;
 }
 
-Image::Image(int rows, int cols, int channels) {
+Image::Image(int rows, int cols, int channels): Image() {
     if (rows <= 0 || cols <= 0 || channels <= 0) {
-        setClear();
-        CountRef = new size_t;
-        *CountRef = 1;
         return;
     }
     Rows = rows;
     Cols = cols;
     Channels = channels;
-    Total = Cols * Rows * Channels;
-    Data = new unsigned char[Total];
+    Total = Cols * Rows;
+    Data = new unsigned char[Total * Channels];
+    IsOwnData = true;
     CountRef = new size_t;
     *CountRef = 1;
 }
 
-Image::Image(int rows, int cols, int channels, unsigned char *data) {
+Image::Image(int rows, int cols, int channels, unsigned char *data){
     if (rows <= 0 || cols <= 0 || channels <= 0 || data == nullptr) {
         setClear();
         CountRef = new size_t;
@@ -33,21 +31,21 @@ Image::Image(int rows, int cols, int channels, unsigned char *data) {
     Rows = rows;
     Cols = cols;
     Channels = channels;
-    Total = Cols * Rows * Channels;
+    Total = Cols * Rows;
     Data = data;
     CountRef = new size_t;
     *CountRef = 1;
 }
 
-Image::Image(const Image &image, const Range &rowRange, const Range &colRange) {
-    if (rowRange.empty() || colRange.empty()) {
+Image::Image(const Image &image, const Range &rowRange, const Range &colRange): Image() {
+    if (rowRange.empty() || colRange.empty()) { //same thing
         setClear();
         CountRef = new size_t;
         *CountRef = 1;
         return;
     }
     Channels = image.Channels;
-    if (image.Cols >= colRange.end() - 1) {
+    if (image.Cols >= colRange.end()) {
         Cols = colRange.size();
     } else if (image.Cols >= colRange.start()) {
         Cols = image.Cols - colRange.start();
@@ -73,7 +71,8 @@ Image::Image(const Image &image, const Range &rowRange, const Range &colRange) {
     Data = image.Data;
     CountRef = image.CountRef;
     Channels = image.Channels;
-    Total = Rows * Cols * Channels;
+    Total = Rows * Cols;
+    IsOwnData = false;
     (*CountRef)++;
 }
 
@@ -110,21 +109,23 @@ unsigned char *Image::data() {
 }
 
 Image Image::clone() const {
+    //Image image(Rows, Cols, Channels, nullptr);
     Image image;
+    copyTo(image);
+    /*
     image.Cols = Cols;
     image.Rows = Rows;
     image.Total = Total;
     image.Channels = Channels;
-    image.CountRef = new size_t;
-    *(image.CountRef) = 1;
-
-    if (!(this->empty())) {
-        image.Data = new unsigned char[image.Total];
-        memcpy(image.Data, Data, Total);
-    } else {
+*/
+    if (!(empty())) {
+        image.Data = new unsigned char[image.Total * image.Channels];
+        image.IsOwnData = true;
+        std::memcpy(image.Data, Data, Total * Channels);
+    } /*else {
         image.Data = nullptr;
     }
-
+*/
     return image;
 }
 
@@ -136,42 +137,35 @@ void Image::copyTo(Image &image) const {
     image.Cols = Cols;
     image.Rows = Rows;
     image.Channels = Channels;
-    image.CountRef = new size_t;
     *image.CountRef = 1;
     image.Total = Total;
-    image.Data = new unsigned char[Total];
-    std::memcpy(image.Data, Data, Total);
+    image.Data = new unsigned char[Total * Channels];
+    image.IsOwnData = true;
+    std::memcpy(image.Data, Data, Total * Channels);
 }
 
 void Image::create(int rows, int cols, int channels) {
+    release();
     if (rows <= 0 || cols <= 0 || channels <= 0) {
         setClear();
-        CountRef = new size_t;
         *CountRef = 1;
         return;
     }
     Rows = rows;
     Cols = cols;
     Channels = channels;
-    Total = Rows * Cols * Channels;
+    Total = Rows * Cols;
     (*CountRef) = 1;
-    Data = new unsigned char[Total];
+    Data = new unsigned char[Total * Channels];
+    IsOwnData = true;
 }
 
 unsigned char &Image::at(int index) {
-    if (index > Total) {
-        throw std::out_of_range("out of range");
-    }
-    unsigned char &pixel = Data[index];
-    return pixel;
+    return Data[index];
 }
 
 const unsigned char &Image::at(int index) const {
-    if (index > Total) {
-        throw std::out_of_range("out of range");
-    }
-    const unsigned char &pixel = Data[index];
-    return pixel;
+    return Data[index];
 }
 
 bool Image::empty() const {
@@ -184,9 +178,8 @@ Image Image::zeros(int rows, int cols, int channels) {
 
 Image Image::values(int rows, int cols, int channels, unsigned char value) {
     Image image(rows, cols, channels);
-    image.Total = rows * cols * channels;
-    image.Data = new unsigned char;
-    std::memset(image.Data, value, image.Total);
+    image.IsOwnData = true;
+    std::memset(image.Data, value, image.Total * image.Channels);
     return image;
 }
 
@@ -195,14 +188,24 @@ void Image::release() {
         --(*CountRef);
 
         if (*CountRef <= 0) {
+            if (IsOwnData) {
+                delete[] Data;
+                Data = nullptr;
+            }
             delete CountRef;
             CountRef = nullptr;
         }
         setClear();
+        CountRef = new size_t;
+        *CountRef = 1;
     }
 }
 
 Image Image::col(int x) const {
+    if (x >= Cols) {
+        return Image();
+    }
+
     return {*this, Range::all(), Range(x, x + 1)};
 }
 
@@ -215,6 +218,10 @@ Image Image::colRange(const Range &range) const {
 }
 
 Image Image::row(int y) const {
+    if (y >= Rows) {
+        return Image();
+    }
+
     return {*this, Range(y, y + 1), Range::all()};
 }
 
@@ -239,10 +246,14 @@ void Image::setClear() {
 }
 
 Image &Image::operator=(const Image &image) {
-    if (this == &image)
+    if (this == &image) {
         return *this;
+    }
     release();
-
+    if (IsOwnData){
+        delete[] Data;
+    }
+    delete CountRef;
 
     Channels = image.Channels;
     Cols = image.Cols;
@@ -250,6 +261,7 @@ Image &Image::operator=(const Image &image) {
     Total = image.Total;
     Data = image.Data;
     CountRef = image.CountRef;
+    IsOwnData = image.IsOwnData;
     (*CountRef)++;
     return *this;
 }
@@ -261,11 +273,13 @@ Image::Image(const Image &image) {
     Data = image.Data;
     Channels = image.Channels;
     CountRef = image.CountRef;
+    IsOwnData = image.IsOwnData;
     (*CountRef)++;
 }
 
 Image::~Image() {
     release();
+    delete CountRef;
 }
 
 

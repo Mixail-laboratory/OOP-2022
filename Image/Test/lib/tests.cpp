@@ -1,41 +1,36 @@
 #include "gtest/gtest.h"
 #include "../../Image.hpp"
+#include <cstring>
 
-void fillImage(Image &img) {
-    for (int i = 0; i < img.total(); ++i) {
-        img.data()[i] = i;
-    }
-}
+bool isEqual(const Image &img1, const Range &rangeRow, const Range &rangeCol, const Image &roi) {
+    for (int rowIdx = 0; rowIdx < rangeRow.size(); ++rowIdx) {
 
-bool isEqual(const Image &img1, const Image &img2) {
-    for (int i = 0; i < img1.total(); ++i) {
-        if (img1.data()[i] != img2.data()[i]) {
-            return false;
+        const auto srcRow = img1.row(rowIdx + rangeRow.start());
+        const auto dstRow = roi.row(rowIdx);
+
+        for (int colIdx = 0; colIdx < rangeCol.size(); ++colIdx) {
+            const auto srcCol = srcRow.col(colIdx + rangeCol.start());
+            const auto dstCol = dstRow.col(colIdx);
+
+            if (srcCol.at(0) != dstCol.at(0))
+                return false;
         }
     }
 
     return true;
 }
 
-TEST(RangeCtor, Default) {
-    Range range;
-
-    EXPECT_EQ(range.start(), 0);
-    EXPECT_EQ(range.end(), 0);
+void fillImage(Image &img) {
+    for (int i = 0; i < img.total() * img.channels(); ++i) {
+        img.data()[i] = i;
+    }
 }
 
 TEST(RangeCtor, InvalidArgs) {
-    Range range(-1, 1);
+    Range range(-2, -10);
 
     EXPECT_EQ(range.start(), 0);
     EXPECT_EQ(range.end(), 0);
-}
-
-TEST(RangeCtor, ValidArgs) {
-    Range range(5, 15);
-
-    EXPECT_EQ(range.start(), 5);
-    EXPECT_EQ(range.end(), 15);
 }
 
 TEST(RangeSize, DefaultCtor) {
@@ -45,24 +40,22 @@ TEST(RangeSize, DefaultCtor) {
 }
 
 TEST(RangeSize, CtorInvalidArgs) {
-    Range range(-5, 5);
+    Range range(-10, -3);
 
     EXPECT_EQ(range.size(), 0);
 }
 
-TEST(RangeSize, CtorValidArgs) {
-    Range range(5, 15);
-
-    EXPECT_EQ(range.size(), 10);
+TEST(RangeSize, ValidArgs) {
+    Range range(1, 101);
+    EXPECT_EQ(range.size(), 100);
 }
 
 TEST(RangeEmpty, DefaultCtor) {
     Range range;
-
     EXPECT_EQ(range.empty(), true);
 }
 
-TEST(RangeEmpty, CtorInvalidArgs) {
+TEST(RangeEmpty, InvalidArgs) {
     Range range(-5, 5);
 
     EXPECT_EQ(range.empty(), true);
@@ -74,198 +67,111 @@ TEST(RangeEmpty, CtorValidArgs) {
     EXPECT_EQ(range.empty(), false);
 }
 
-
-TEST(RangeAll, StartAndEnd) {
-    Range range = Range::all();
-    EXPECT_EQ(range.start(), 0);
-    EXPECT_EQ(range.end(), std::numeric_limits<int>::max());
+TEST(ImageCtor, InvalidArgs) {
+    Image image(-1, 0, -3);
+    EXPECT_EQ(image.rows(), 0);
+    EXPECT_EQ(image.cols(), 0);
+    EXPECT_EQ(image.total(), 0);
+    EXPECT_EQ(image.countRef(), 1);
+    EXPECT_EQ(image.channels(), 0);
+    EXPECT_EQ(image.data(), nullptr);
+    EXPECT_TRUE(image.empty());
 }
 
 
-TEST(ImageCtor, Default) {
-    Image img;
-    EXPECT_EQ(img.rows(), 0);
-    EXPECT_EQ(img.cols(), 0);
-    EXPECT_EQ(img.total(), 0);
-    EXPECT_EQ(img.countRef(), 1);
-    EXPECT_EQ(img.channels(), 0);
-    EXPECT_EQ(img.data(), nullptr);
-    EXPECT_TRUE(img.empty());
+TEST(ImageCtor, InvalidData) {
+    Image image(10, 10, 5, nullptr);
+    EXPECT_EQ(image.rows(), 0);
+    EXPECT_EQ(image.cols(), 0);
+    EXPECT_EQ(image.total(), 0);
+    EXPECT_EQ(image.countRef(), 1);
+    EXPECT_EQ(image.channels(), 0);
+    EXPECT_EQ(image.data(), nullptr);
 }
 
-TEST(ImageCtor, InvalidRow) {
-    Image img(-5, 5, 5);
-    EXPECT_EQ(img.rows(), 0);
-    EXPECT_EQ(img.cols(), 0);
-    EXPECT_EQ(img.total(), 0);
-    EXPECT_EQ(img.countRef(), 1);
-    EXPECT_EQ(img.channels(), 0);
-    EXPECT_EQ(img.data(), nullptr);
-    EXPECT_TRUE(img.empty());
+TEST(ImageCtor, InvalidRanges) {
+    Image image_1(3, 4, 5);
+    Image image_2(image_1, Range(-5, 5), Range(-10, 5));
+    EXPECT_EQ(image_2.rows(), 0);
+    EXPECT_EQ(image_2.cols(), 0);
+    EXPECT_EQ(image_2.total(), 0);
+    EXPECT_EQ(image_2.countRef(), 1);
+    EXPECT_EQ(image_2.channels(), 0);
+    EXPECT_EQ(image_2.data(), nullptr);
 }
 
-TEST(ImageCtor, InvalidCol) {
-    Image img(5, -5, 5);
-    EXPECT_EQ(img.rows(), 0);
-    EXPECT_EQ(img.cols(), 0);
-    EXPECT_EQ(img.total(), 0);
-    EXPECT_EQ(img.countRef(), 1);
-    EXPECT_EQ(img.channels(), 0);
-    EXPECT_EQ(img.data(), nullptr);
-    EXPECT_TRUE(img.empty());
+
+TEST(ImageCtor, ValidACtor) {
+    Image image(1, 2, 5);
+    EXPECT_EQ(image.rows(), 1);
+    EXPECT_EQ(image.cols(), 2);
+    EXPECT_EQ(image.channels(), 5);
+    EXPECT_EQ(image.total(), 2);
 }
 
-TEST(ImageCtor, InvalidChannel) {
-    Image img(5, 5, -5);
-    EXPECT_EQ(img.rows(), 0);
-    EXPECT_EQ(img.cols(), 0);
-    EXPECT_EQ(img.total(), 0);
-    EXPECT_EQ(img.countRef(), 1);
-    EXPECT_EQ(img.channels(), 0);
-    EXPECT_EQ(img.data(), nullptr);
-    EXPECT_TRUE(img.empty());
-}
+TEST(ImageCtor, ValidDataAndArgs) {
+    unsigned char *TestData = new unsigned char[10];
 
-TEST(ImageCtor, InvalidPointerArr) {
-    Image img(5, 5, 5, nullptr);
-    EXPECT_EQ(img.rows(), 0);
-    EXPECT_EQ(img.cols(), 0);
-    EXPECT_EQ(img.total(), 0);
-    EXPECT_EQ(img.countRef(), 1);
-    EXPECT_EQ(img.channels(), 0);
-    EXPECT_EQ(img.data(), nullptr);
-    EXPECT_TRUE(img.empty());
-}
+    Image image(1, 2, 5, TestData);
+    EXPECT_EQ(image.rows(), 1);
+    EXPECT_EQ(image.cols(), 2);
+    EXPECT_EQ(image.channels(), 5);
 
-TEST(ImageCtor, InvalidRowRanges) {
-    Image ref_image(5, 5, 5);
-    Image img(ref_image, Range(-5, 5), Range(0, 5));
-    EXPECT_EQ(img.rows(), 0);
-    EXPECT_EQ(img.cols(), 0);
-    EXPECT_EQ(img.total(), 0);
-    EXPECT_EQ(img.countRef(), 1);
-    EXPECT_EQ(img.channels(), 0);
-    EXPECT_EQ(img.data(), nullptr);
-    EXPECT_TRUE(img.empty());
-}
-
-TEST(ImageCtor, InvalidColRanges) {
-    Image ref_image(5, 5, 5);
-    Image img(ref_image, Range(0, 5), Range(-5, 5));
-    EXPECT_EQ(img.rows(), 0);
-    EXPECT_EQ(img.cols(), 0);
-    EXPECT_EQ(img.total(), 0);
-    EXPECT_EQ(img.countRef(), 1);
-    EXPECT_EQ(img.channels(), 0);
-    EXPECT_EQ(img.data(), nullptr);
-    EXPECT_TRUE(img.empty());
-}
-
-TEST(ImageCtor, ValidArgs) {
-    Image img(5, 5, 5);
-    EXPECT_EQ(img.rows(), 5);
-    EXPECT_EQ(img.cols(), 5);
-    EXPECT_EQ(img.channels(), 5);
-    EXPECT_EQ(img.total(), 125);
-    EXPECT_EQ(img.countRef(), 1);
-    EXPECT_FALSE(img.empty());
-}
-
-TEST(ImageCtor, ValidArgsWithPointer) {
-    unsigned char *TestData = new unsigned char[100];
-
-    Image img(5, 5, 5, TestData);
-    EXPECT_EQ(img.rows(), 5);
-    EXPECT_EQ(img.cols(), 5);
-    EXPECT_EQ(img.channels(), 5);
-    EXPECT_EQ(img.total(), 125);
-    EXPECT_EQ(img.countRef(), 1);
-    EXPECT_EQ(img.data(), TestData);
-    EXPECT_FALSE(img.empty());
-
+    EXPECT_EQ(image.total(), 2);
+    EXPECT_EQ(image.countRef(), 1);
+    EXPECT_EQ(image.data(), TestData);
+    EXPECT_FALSE(image.empty());
     delete[] TestData;
 }
 
+TEST(ImageCtor, RangesCase) {
+    std::shared_ptr<unsigned char> TestData(new unsigned char[10]);
+    Image image_1 = Image(1, 2, 5, TestData.get());
 
 
-TEST(ImageCtor, CopyOfValidImg) {
-    unsigned char *TestData = new unsigned char[150];
+    Image image(image_1, Range().all(), Range().all());
+    EXPECT_EQ(image.rows(), 1);
+    EXPECT_EQ(image.cols(), 2);
+    EXPECT_EQ(image.channels(), 5);
+    EXPECT_EQ(image.total(), 2);
+    EXPECT_EQ(image.countRef(), 2);
+    EXPECT_EQ(image.data(), TestData.get());
+    EXPECT_FALSE(image.empty());
 
-    Image refimg = Image(5, 5, 5, TestData);
+    EXPECT_EQ(std::memcmp(image.data(), image_1.data(), image.channels() * image.total()), 0);
 
-    fillImage(refimg);
 
-    Image img(refimg);
-    EXPECT_EQ(img.rows(), 5);
-    EXPECT_EQ(img.cols(), 5);
-    EXPECT_EQ(img.channels(), 5);
-    EXPECT_EQ(img.total(), 125);
-    EXPECT_EQ(img.countRef(), 2);
-    EXPECT_EQ(img.data(), TestData);
-    EXPECT_FALSE(img.empty());
-
-    EXPECT_TRUE(isEqual(img, refimg));
-
-    delete[] TestData;
 }
 
-TEST(ImageCtor, CopyWithRanges) {
-    unsigned char *TestData = new unsigned char[125];
-    Image refimg = Image(5, 5, 5, TestData);
+TEST(ImageCtor, ValidCopy) {
+    std::shared_ptr<unsigned char> TestData(new unsigned char[10]);
+    std::memset(TestData.get(), 5, 10);
+    Image image_1 = Image(1, 2, 5, TestData.get());
+    Image image(image_1);
+    EXPECT_EQ(image.rows(), 1);
+    EXPECT_EQ(image.cols(), 2);
+    EXPECT_EQ(image.channels(), 5);
+    EXPECT_EQ(image.total(), 2);
+    EXPECT_EQ(image.countRef(), 2);
+    EXPECT_EQ(image.data(), TestData.get());
+    EXPECT_FALSE(image.empty());
 
-    fillImage(refimg);
-
-    Image img(refimg, Range().all(), Range().all());
-    EXPECT_EQ(img.rows(), 5);
-    EXPECT_EQ(img.cols(), 5);
-    EXPECT_EQ(img.channels(), 5);
-    EXPECT_EQ(img.total(), 125);
-    EXPECT_EQ(img.countRef(), 2);
-    EXPECT_EQ(img.data(), TestData);
-    EXPECT_FALSE(img.empty());
-
-    EXPECT_TRUE(isEqual(img, refimg));
-
-    delete[] TestData;
+    EXPECT_EQ(std::memcmp(image.data(), image_1.data(), image.channels() * image.total()), 0);
 }
 
-TEST(ImageOperatorAssignment, EmptyImg) {
-    const Image img;
-    std::vector<Image> imgs(100);
-    for (int i = 0; i < imgs.size(); ++i) {
-        imgs[i] = img;
-        ASSERT_EQ(img.countRef(), i + 2);
-    }
-    imgs.clear();
-    ASSERT_EQ(img.countRef(), 1);
-}
-
-TEST(ImageOperatorAssignment, ValidImg) {
-    Image img(5, 5, 5);
-    fillImage(img);
-
-    std::vector<Image> imgs(100);
-    for (int i = 0; i < imgs.size(); ++i) {
-        imgs[i] = img;
-        ASSERT_EQ(img.countRef(), i + 2);
-        EXPECT_TRUE(isEqual(img, imgs[i]));
-    }
-    imgs.clear();
-    ASSERT_EQ(img.countRef(), 1);
-}
 
 TEST(ImageOperatorBrackets, InvalidRowRange) {
-    Image img(10, 10, 10);
+    Image image(10, 10, 10);
 
-    Image img2 = img(Range(-10, 10), Range(0, 10));
+    Image image_2 = image(Range(-10, 10), Range(0, 10));
 
-    EXPECT_EQ(img2.rows(), 0);
-    EXPECT_EQ(img2.cols(), 0);
-    EXPECT_EQ(img2.total(), 0);
-    EXPECT_EQ(img2.countRef(), 1);
-    EXPECT_EQ(img2.channels(), 0);
-    EXPECT_EQ(img2.data(), nullptr);
-    EXPECT_TRUE(img2.empty());
+    EXPECT_EQ(image_2.rows(), 0);
+    EXPECT_EQ(image_2.cols(), 0);
+    EXPECT_EQ(image_2.total(), 0);
+    EXPECT_EQ(image_2.countRef(), 1);
+    EXPECT_EQ(image_2.channels(), 0);
+    EXPECT_EQ(image_2.data(), nullptr);
+    EXPECT_TRUE(image_2.empty());
 
 }
 
@@ -281,94 +187,57 @@ TEST(ImageOperatorBrackets, InvalidColRange) {
     EXPECT_EQ(img2.channels(), 0);
     EXPECT_EQ(img2.data(), nullptr);
     EXPECT_TRUE(img2.empty());
-
-}
-
-TEST(ImageOperatorBrackets, ValidImg) {
-    Image img(10, 10, 10);
-
-    fillImage(img);
-
-    for (int i = 0; i < 10; ++i) {
-        auto tempimg1 = img(Range(0, 10 - i), Range(0, 10 - i));
-        auto tempimg2 = img(Range(i, 10), Range(i, 10));
-
-        ASSERT_TRUE(isEqual(img, tempimg1));
-        ASSERT_TRUE(isEqual(img, tempimg2));
-    }
 }
 
 
 TEST(ImageCopy, EmptyImg) {
-    const Image img;
-    const Image clone = img.clone();
-    EXPECT_EQ(img.countRef(), 1);
-    EXPECT_EQ(clone.countRef(), 1);
+    const Image image;
+    const Image cloneImage = image.clone();
+    EXPECT_EQ(image.countRef(), 1);
+    EXPECT_EQ(cloneImage.countRef(), 1);
 }
 
 TEST(ImageCopy, ValidImg) {
-    const Image img(10, 10, 10);
+    const Image image(5, 5, 5);
 
-    Image cloneimg = img.clone();
+    Image cloneimage = image.clone();
 
-    EXPECT_TRUE(isEqual(img, cloneimg));
-    EXPECT_FALSE(img.data() == cloneimg.data());
+    EXPECT_EQ(std::memcmp(image.data(), cloneimage.data(), image.total() * image.channels()), 0);
+    EXPECT_FALSE(image.data() == cloneimage.data());
 }
 
-TEST(ImageCopy, RefImg) {
-    const Image img(10, 10, 10);
-
-    Image cloneimg = Image(img).clone();
-
-    EXPECT_TRUE(isEqual(img, cloneimg));
-    EXPECT_FALSE(img.data() == cloneimg.data());
-}
 
 TEST(ImageCopyTo, EmptyImg) {
-    const Image img;
+    const Image image;
     Image clone;
-    img.copyTo(clone);
-    EXPECT_EQ(img.countRef(), 1);
+    image.copyTo(clone);
+    EXPECT_EQ(image.countRef(), 1);
     EXPECT_EQ(clone.countRef(), 1);
 }
 
 TEST(ImageCopyTo, ValidImgs) {
-    Image img(5, 5, 5);
-
-    fillImage(img);
+    std::unique_ptr<unsigned char> Data(new unsigned char[125]);
+    Image image(5, 5, 5, Data.get());
 
     Image clone;
-    img.copyTo(clone);
-    EXPECT_EQ(img.countRef(), 1);
+    image.copyTo(clone);
+    EXPECT_EQ(image.countRef(), 1);
     EXPECT_EQ(clone.countRef(), 1);
 
-    EXPECT_TRUE(isEqual(img, clone));
+    EXPECT_EQ(std::memcmp(image.data(), clone.data(), image.total() * image.channels()), 0);
 }
 
-TEST(ImageCopyTo, RefImages) {
-    Image img(5, 5, 5);
+TEST(ImageCopyTo, This) {
+    Image image(10, 10, 10);
+    std::memset(image.data(), 5, image.channels() * image.total());
 
-    fillImage(img);
+    Image copy = image(Range(5, 10), Range(5, 10));
+    copy.copyTo(copy);
 
-    Image clone;
-    Image(img).copyTo(clone);
-    EXPECT_EQ(img.countRef(), 1);
-
-
-    EXPECT_TRUE(isEqual(img, clone));
-}
-
-TEST(ImageCopyTo, Self) {
-    Image img(10, 10, 10);
-    fillImage(img);
-
-    Image ref = img(Range(5, 10), Range(5, 10));
-    ref.copyTo(ref);
-
-    EXPECT_EQ(img.countRef(), 2);
-    EXPECT_EQ(img.data(), ref.data());
-    EXPECT_EQ(ref.countRef(), 2);
-    EXPECT_TRUE(isEqual(img, ref));
+    EXPECT_EQ(image.countRef(), 2);
+    EXPECT_EQ(image.data(), copy.data());
+    EXPECT_EQ(copy.countRef(), 2);
+    EXPECT_EQ(std::memcmp(image.data(), copy.data(), image.total() * image.channels()), 0);
 }
 
 TEST(ImageCreate, InvalidRow) {
@@ -415,125 +284,59 @@ TEST(ImageCreate, ValidArgs) {
     }
 }
 
-TEST(ImageEmpty, EmptyImage) {
-    Image img;
-    EXPECT_TRUE(img.empty());
+
+TEST(ImageEmpty, FalseEmpty) {
+    Image image(1, 2, 3);
+    EXPECT_FALSE(image.empty());
 }
 
-TEST(ImageEmpty, NotEmptyImage) {
-    Image img(5, 5, 5);
-    EXPECT_FALSE(img.empty());
+TEST(ImageRelease, InvalidArgs) {
+    Image image(-2, 0, -100);
+    image.release();
+    EXPECT_EQ(image.countRef(), 1);
+    EXPECT_EQ(image.channels(), 0);
+    EXPECT_EQ(image.rows(), 0);
+    EXPECT_EQ(image.cols(), 0);
+    EXPECT_EQ(image.total(), 0);
 }
 
-TEST(ImageRelease, InvalidRow) {
-    Image img(-2, 2, 2);
-    EXPECT_EQ(img.countRef(), 1);
-
-    img.release();
-
-    EXPECT_EQ(img.countRef(), 0);
-    EXPECT_EQ(img.channels(), 0);
-    EXPECT_EQ(img.rows(), 0);
-    EXPECT_EQ(img.cols(), 0);
-    EXPECT_EQ(img.total(), 0);
+TEST(ImageRelease, InvalidData) {
+    Image image(5, 5, 5, nullptr);
+    image.release();
+    EXPECT_EQ(image.countRef(), 1);
+    EXPECT_EQ(image.channels(), 0);
+    EXPECT_EQ(image.rows(), 0);
+    EXPECT_EQ(image.cols(), 0);
+    EXPECT_EQ(image.total(), 0);
 }
 
-TEST(ImageRelease, InvalidCol) {
-    Image img(2, -2, 2);
-    EXPECT_EQ(img.countRef(), 1);
+TEST(ImageRelease, InvalidRanges) {
+    Image image(10, 10, 10);
+    std::memset(image.data(), 5, image.channels() * image.total());
 
-    img.release();
+    Image partimg = image(Range(-5, 3), Range(0, -100));
 
-
-    EXPECT_EQ(img.countRef(), 0);
-    EXPECT_EQ(img.channels(), 0);
-    EXPECT_EQ(img.rows(), 0);
-    EXPECT_EQ(img.cols(), 0);
-    EXPECT_EQ(img.total(), 0);
-}
-
-
-TEST(ImageRelease, InvalidChannel) {
-    Image img(2, 2, -2);
-    EXPECT_EQ(img.countRef(), 1);
-
-    img.release();
-
-
-
-    EXPECT_EQ(img.countRef(), 0);
-    EXPECT_EQ(img.channels(), 0);
-    EXPECT_EQ(img.rows(), 0);
-    EXPECT_EQ(img.cols(), 0);
-    EXPECT_EQ(img.total(), 0);
-}
-
-TEST(ImageRelease, InvalidPointerArr) {
-    Image img(2, 2, 2, nullptr);
-    EXPECT_EQ(img.countRef(), 1);
-
-    img.release();
-
-
-
-    EXPECT_EQ(img.countRef(), 0);
-    EXPECT_EQ(img.channels(), 0);
-    EXPECT_EQ(img.rows(), 0);
-    EXPECT_EQ(img.cols(), 0);
-    EXPECT_EQ(img.total(), 0);
-}
-
-TEST(ImageRelease, InvalidRowRanges) {
-    Image img(10, 10, 10);
-    fillImage(img);
-
-    Image partimg = img(Range(-5, 5), Range(0, 5));
-
-    EXPECT_EQ(img.countRef(), 1);
+    EXPECT_EQ(image.countRef(), 1);
     EXPECT_EQ(partimg.countRef(), 1);
 
-    img.release();
-
-    EXPECT_EQ(img.countRef(), 0);
+    image.release();
+    EXPECT_EQ(image.countRef(), 1);
     EXPECT_EQ(partimg.countRef(), 1);
-
-
-
-    EXPECT_EQ(img.channels(), 0);
-    EXPECT_EQ(img.rows(), 0);
-    EXPECT_EQ(img.cols(), 0);
-    EXPECT_EQ(img.total(), 0);
-}
-
-TEST(ImageRelease, InvalidColRanges) {
-    Image img(10, 10, 10);
-    fillImage(img);
-
-    Image partimg = img(Range(0, 5), Range(-5, 5));
-
-    EXPECT_EQ(img.countRef(), 1);
-    EXPECT_EQ(partimg.countRef(), 1);
-
-    img.release();
-
-    EXPECT_EQ(img.countRef(), 0);
-    EXPECT_EQ(partimg.countRef(), 1);
-
-    EXPECT_EQ(img.channels(), 0);
-    EXPECT_EQ(img.rows(), 0);
-    EXPECT_EQ(img.cols(), 0);
-    EXPECT_EQ(img.total(), 0);
+    EXPECT_EQ(image.channels(), 0);
+    EXPECT_EQ(image.rows(), 0);
+    EXPECT_EQ(image.cols(), 0);
+    EXPECT_EQ(image.total(), 0);
 }
 
 TEST(ImageRelease, ValidCopy) {
-    const Image img(2, 2, 2);
-    Image copy = img;
+    const Image image(5, 5, 5);
+    Image copy = image;
     EXPECT_EQ(copy.countRef(), 2);
-    EXPECT_EQ(img.countRef(), 2);
+    EXPECT_EQ(image.countRef(), 2);
 
     copy.release();
 
-    EXPECT_EQ(img.countRef(), 1);
+    EXPECT_EQ(image.countRef(), 1);
 
     EXPECT_EQ(copy.countRef(), 1);
     EXPECT_EQ(copy.channels(), 0);
@@ -542,135 +345,87 @@ TEST(ImageRelease, ValidCopy) {
     EXPECT_EQ(copy.total(), 0);
 }
 
-TEST(ImageRelease, ValidArgs) {
-    for (int cols = 1; cols < 10; ++cols) {
-        for (int rows = 1; rows < 10; ++rows) {
-            for (int ch = 1; ch < 10; ++ch) {
-                Image img(rows, cols, ch);
-                img.release();
-                EXPECT_EQ(img.channels(), 0);
-                EXPECT_EQ(img.rows(), 0);
-                EXPECT_EQ(img.cols(), 0);
-                ASSERT_EQ(img.total(), 0);
-            }
-        }
-    }
-}
+TEST(ImageZeroes, ZeroesCreateImage) {
+    const Image image = Image::zeros(5, 5, 5);
+    std::unique_ptr<unsigned char> TestData(new unsigned char[125]);
+    std::memset(TestData.get(), 0, 125);
 
-TEST(ImageRelease, ValidArgsWithPointer) {
-    for (int cols = 1; cols < 10; ++cols) {
-        for (int rows = 1; rows < 10; ++rows) {
-            for (int ch = 1; ch < 10; ++ch) {
-                unsigned char ptr[1];
-                Image img(rows, cols, ch, ptr);
-                img.release();
-                EXPECT_EQ(img.channels(), 0);
-                EXPECT_EQ(img.rows(), 0);
-                EXPECT_EQ(img.cols(), 0);
-                ASSERT_EQ(img.total(), 0);
-            }
-        }
-    }
+    EXPECT_EQ(std::memcmp(image.data(), TestData.get(), 125), 0);
 }
 
 TEST(ImageCol, EmptyImg) {
-    Image img;
+    Image image;
     Image emptyimg;
+    Image colImg = image.col(0);
 
-    EXPECT_TRUE(isEqual(img.col(0), emptyimg));
+    EXPECT_TRUE(colImg.data() == emptyimg.data());
 }
 
 TEST(ImageCol, InvalidArg) {
-    Image img(5, 5, 5);
-    Image emptyimg;
-
-    EXPECT_TRUE(isEqual(img.col(-10), emptyimg));
+    Image image(5, 5, 5);
+    EXPECT_TRUE(image.col(image.cols()).empty());
 }
 
-TEST(ImageCol, ValidArgs) {
-    Image img(5, 5, 5);
-    Image comp(5, 5, 5);
-
-    fillImage(img);
-    fillImage(comp);
-
-    for (int i = 0; i < 5; ++i) {
-        EXPECT_TRUE(isEqual(img.col(i), comp.col(i)));
-    }
-}
 
 TEST(ImageColRange, EmptyImg) {
-    Image img;
+    Image image;
     Image emptyimg;
 
-    EXPECT_TRUE(isEqual(img.colRange(Range().all()), emptyimg));
+    EXPECT_EQ(image.data(), emptyimg.data());
 }
 
 TEST(ImageColRange, RangeAll) {
-    Image img(5, 5, 5);
+    Image image(5, 5, 5);
     Image emptyimg;
+    Image imageCol = image.colRange(Range().all());
 
-    EXPECT_TRUE(isEqual(img.colRange(Range().all()), img));
+    EXPECT_EQ(std::memcmp(imageCol.data(), image.data(), imageCol.total() * imageCol.channels()), 0);
 }
 
-TEST(ImageColRange, ColRangeOfColRange) {
-    Image img(5, 5, 5);
-    Image comp(5, 5, 5);
-
-    fillImage(img);
-    auto newimage = img.colRange(Range().all());
-
-    EXPECT_TRUE(isEqual(img, newimage.colRange(Range().all())));
-
-}
 
 TEST(ImageRow, EmptyImg) {
-    Image img;
+    Image image;
     Image emptyimg;
 
-    EXPECT_TRUE(isEqual(img.row(0), emptyimg));
+    EXPECT_TRUE(image.row(0).data() == emptyimg.data());
 }
 
 TEST(ImageRow, InvalidArg) {
-    Image img(5, 5, 5);
+    Image img(10, 10, 10);
     Image emptyimg;
 
-    EXPECT_TRUE(isEqual(img.row(-10), emptyimg));
+    EXPECT_TRUE(img.row(10).empty());
 }
 
-TEST(ImageRow, ValidArgs) {
-    Image img(5, 5, 5);
-    Image comp(5, 5, 5);
 
+TEST(ImageCol, ValidArgs) {
+    Image img(10, 10, 10);
     fillImage(img);
-    fillImage(comp);
 
-    for (int i = 0; i < 5; ++i) {
-        EXPECT_TRUE(isEqual(img.row(i), comp.row(i)));
+    for (int col = 0; col < img.cols(); col++) {
+        const Image roi = img.col(col);
+        ASSERT_TRUE(img.countRef() == 2);
+        ASSERT_TRUE(img.data() == roi.data());
+        ASSERT_TRUE(img.channels() == roi.channels());
+        ASSERT_TRUE(img.rows() == roi.rows());
+        ASSERT_TRUE(1 == roi.cols());
+        ASSERT_TRUE(isEqual(img, Range(0, img.rows()), Range(col, col + 1),
+                            roi));
     }
 }
 
-TEST(ImageRowRange, EmptyImg) {
-    Image img;
-    Image emptyimg;
 
-    EXPECT_TRUE(isEqual(img.colRange(Range().all()), emptyimg));
-}
-
-TEST(ImageRowRange, RangeAll) {
-    Image img(5, 5, 5);
-    Image emptyimg;
-
-    EXPECT_TRUE(isEqual(img.colRange(Range().all()), img));
-}
-
-TEST(ImageRowRange, ColRangeOfColRange) {
-    Image img(5, 5, 5);
-    Image comp(5, 5, 5);
-
+TEST(ImageColRange, ColRangeOfColRange) {
+    Image img(10, 10, 10);
     fillImage(img);
-    auto newimage = img.colRange(Range().all());
-
-    EXPECT_TRUE(isEqual(img, newimage.colRange(Range().all())));
-
+    Image roi(img);
+    for (int col = 0; col < img.cols(); ++col) {
+        roi = roi.colRange(Range(0, img.cols() - col));
+        ASSERT_TRUE(img.countRef() == 2);
+        ASSERT_TRUE(img.data() == roi.data());
+        ASSERT_TRUE(img.channels() == roi.channels());
+        ASSERT_TRUE(img.rows() == roi.rows());
+        ASSERT_TRUE(img.cols() - col == roi.cols());
+        ASSERT_TRUE(isEqual(img, Range(0, img.rows()), Range(0, img.cols() - col), roi));
+    }
 }

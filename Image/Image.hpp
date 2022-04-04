@@ -3,7 +3,6 @@
 
 #include "Range.hpp"
 #include <cstdlib>
-#include <memory>
 
 class Image {
 
@@ -75,7 +74,8 @@ private:
     size_t *CountRef;
 
     void setClear();
+    bool IsOwnData = false;
 };
 
 
-#endif //IMAGE_IMAGE_HPP
+#endif

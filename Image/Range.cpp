@@ -1,5 +1,6 @@
 #include "Range.hpp"
 #include <limits>
+
 Range::Range() : _start(0), _end(0) {}
 
 Range::Range(int _start, int _end) {
@@ -28,7 +29,7 @@ int Range::size() const {
 }
 
 Range Range::all() {
-    return {0, std::numeric_limits<int>::max()};
+    return Range(0, std::numeric_limits<int>::max());
 }
 
 

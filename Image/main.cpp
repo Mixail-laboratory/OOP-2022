@@ -1,10 +1,20 @@
-#include <iostream>
-
+#include <vector>
 #include "Image.hpp"
+void CreateImage(Image &img) {
+    for (int i = 0; i < img.total() * img.channels(); ++i) {
+        img.data()[i] = i;
+    }
+
+}
 int main() {
+    Image img(5, 5, 5);
+    CreateImage(img);
 
-    Image image = {-1, 2, 3};
+    std::vector<Image> imgs(100);
+    for (int i = 0; i < imgs.size(); ++i) {
+        imgs[i] = img;
+    }
+    imgs.clear();
 
-    std::cout << image.channels() << std::endl;
     return 0;
 }
