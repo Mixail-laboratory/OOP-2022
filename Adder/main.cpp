@@ -1,22 +1,24 @@
 #include <iostream>
-#include "FileIO.hpp"
-#include "Adder.hpp"
+#include <fstream>
+#include "StreamIO.hpp"
 
-int main() {
-    std::vector<Number> nums = FileIO::getNumbersfromFile("input.txt");
-    int base = FileIO::getReturnBase("input.txt");
 
-    Number sum = Adder::plus(nums[0], nums[1], base);
-    std::cout << "Hello, World!" << std::endl;
-    std::vector<int> answer = {1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1};
-    int i = 0;
-    for (auto item: sum.digits) {
-        if (item != answer[i]){
-            std::cout << "false";
-        }
-        i++;
+int main(int argc, char *argv[]) {
+    InputData data;
+    Number sum;
+    std::ifstream ifstream("input.txt");
+    try {
+        data = StreamIO::getInputData(ifstream);
+        sum = Number::plus(data.numberA, data.numberB, data.returnBase);
+        StreamIO::writeNumber(std::cout, sum);
     }
-    FileIO::writeToFile("output.txt", sum);
+    catch (std::invalid_argument excpetion) {
+
+        std::cout << excpetion.what();
+        //std::cout << "Invalid data was found, operation will be executed with default numbers" << std::endl;
+
+    }
+
 
     return 0;
 }

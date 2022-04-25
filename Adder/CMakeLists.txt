@@ -3,4 +3,5 @@ project(Adder)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(Adder main.cpp Number.cpp Number.hpp FileIO.cpp FileIO.hpp Adder.hpp Adder.cpp)
+add_subdirectory(Test/lib)
+add_executable(Adder main.cpp Number.cpp Number.hpp StreamIO.cpp StreamIO.hpp)
