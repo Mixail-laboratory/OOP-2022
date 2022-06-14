@@ -1,0 +1,24 @@
+# ninja log v5
+723	770	1653889444173263567	WhoWhereWas	423ac5cc1bbd0916
+3107	3131	1652075889189707191	lib/libgtest.a	683d210e222e096e
+1	612	1653665527677474878	Test/lib/CMakeFiles/Google_Tests_run.dir/__/__/PlacementDictionary.cpp.o	8d7382c41f6db1e4
+1	461	1652677891252651750	CMakeFiles/WhoWhereWas.dir/UsersMoving.cpp.o	188ebbe59444906d
+0	49	1653284969371035637	build.ninja	3a914b3ddc565027
+1	3107	1652075889161706912	Test/lib/googletest/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o	525ed80029b7ccfd
+1	670	1652075906545879859	Test/lib/CMakeFiles/Google_Tests_run.dir/test.cpp.o	b6bd7c25e278b7b5
+1	505	1652022580980611191	CMakeFiles/WhoWhereWas.dir/UserMoving.cpp.o	cc4e84fa32611286
+1	713	1652006995353051277	CMakeFiles/WhoWhereWas.dir/GenerateUserInfo.cpp.o	14c621b33cbb0440
+1091	1213	1653665666002949269	Test/lib/Google_Tests_run	9779da730d01bc8f
+1	534	1652442570067478322	Test/lib/CMakeFiles/Google_Tests_run.dir/__/__/UsersMoving.cpp.o	759f61fba3b6f7ae
+1	570	1653889443973263067	CMakeFiles/WhoWhereWas.dir/PlacementDictionary.cpp.o	27235cc2821ffb9a
+1	415	1651339903115257993	CMakeFiles/WhoWhereWas.dir/UserTrajectory.cpp.o	adf7d8c5135275ee
+1	781	1653665527845476664	Test/lib/CMakeFiles/Google_Tests_run.dir/__/__/StreamIO.cpp.o	9a19b5d311339aaf
+1	911	1652075886969685105	Test/lib/googletest/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o	2d0f55722ff25b82
+1	722	1653889444125263447	CMakeFiles/WhoWhereWas.dir/StreamIO.cpp.o	4d77fd141417fa37
+0	1091	1653665665882947987	Test/lib/CMakeFiles/Google_Tests_run.dir/tests.cpp.o	884dffc549ff0fdd
+0	626	1653889444029263207	CMakeFiles/WhoWhereWas.dir/main.cpp.o	1a55efd2cf574707
+3131	3136	1652075889193707231	lib/libgtest_main.a	5fb4a6d5d4a16a3f
+1	572	1653890003466737323	CMakeFiles/WhoWhereWas.dir/PlacementDictionary.cpp.o	27235cc2821ffb9a
+0	626	1653890003518737466	CMakeFiles/WhoWhereWas.dir/main.cpp.o	1a55efd2cf574707
+1	726	1653890003618737743	CMakeFiles/WhoWhereWas.dir/StreamIO.cpp.o	4d77fd141417fa37
+726	775	1653890003666737876	WhoWhereWas	423ac5cc1bbd0916

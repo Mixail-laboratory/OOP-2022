@@ -1,0 +1,5 @@
+Shop 8 8 15 15
+Home 0 0 10 10
+Bedroom 0 0 4 5
+GeekShop 10 2 13 10
+Home2 0 0 10 10
